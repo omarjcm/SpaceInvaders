@@ -1,6 +1,7 @@
 from pickle import FALSE
 from turtle import window_height, window_width
 from Invader import *
+from player import Player
 import pygame
 
 pygame.init()
@@ -27,6 +28,10 @@ def create_invaders():
 
 
 create_invaders()
+
+player = Player(int(window_width/2), window_height - 100)
+player_group.add( player )
+
 game = True
 while game:
     screen.blit( background, (0,0) )
