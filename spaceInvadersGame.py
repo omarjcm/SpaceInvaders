@@ -1,60 +1,87 @@
 import pygame
+import random
 from invader import *
 from player import *
 
-pygame.init()
+class Game:
+    screen = None
+    window_height = 600
+    window_width = 800
 
-window_height = 600
-window_width = 800
+    gameover = 0
 
-rows = 3
-cols = 10
+    rows = 3
+    cols = 10
 
-clock = pygame.time.Clock()
+    def __init__(self):
+        pygame.init()
 
-screen = pygame.display.set_mode((window_width, window_height))
-pygame.display.set_caption( 'Space Invaders' )
+        self.clock = pygame.time.Clock()
+        self.timer = pygame.time.get_ticks()
 
-background = pygame.image.load('./images/background.jpg')
+        self.screen = pygame.display.set_mode((self.window_width, self.window_height))
+        pygame.display.set_caption( 'Space Invaders' )
 
-invaders_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
+        self.background = pygame.image.load('./images/background.jpg')
 
-invader_bullets_group = pygame.sprite.Group()
-player_bullets_group = pygame.sprite.Group()
+        self.invaders_group = pygame.sprite.Group()
+        self.player_group = pygame.sprite.Group()
 
-def create_invaders():
-    for row in range(rows):
-        for col in range(cols):
-            invader = Invader(100 + col * 65, 80 + row * 50)
-            invaders_group.add( invader )
+        self.invader_bullets_group = pygame.sprite.Group()
+        self.player_bullets_group = pygame.sprite.Group()
 
+        self.create_invaders()
 
-create_invaders()
+        self.player = Player(int(self.window_width/2), self.window_height - 10, self)
+        self.player_group.add( self.player )
 
-player = Player(int(window_width/2), window_height - 10, window_width)
-player_group.add( player )
+        game = True
+        while game:
+            self.clock.tick(60)
+            self.screen.blit( self.background, (0,0) )
 
-game = True
-while game:
-    clock.tick(60)
+            if len(self.invaders_group) == 0:
+                self.gameover = 1
 
-    screen.blit( background, (0,0) )
+            if self.gameover == 0:
+                seconds = (pygame.time.get_ticks() - self.timer) / 1000
+                if seconds > 5:
+                    self.create_invader_bullets()
+                    self.timer = pygame.time.get_ticks()
 
-    invaders_group.update()
-    player_group.update()
-    invader_bullets_group.update()
-    player_bullets_group.update()
+                self.invaders_group.update()
+                self.player_group.update()
+                self.invader_bullets_group.update()
+                self.player_bullets_group.update()
 
-    invaders_group.draw( screen )
-    player_group.draw( screen )
-    invader_bullets_group.draw( screen )
-    player_bullets_group.draw( screen )
+                self.invaders_group.draw( self.screen )
+                self.player_group.draw( self.screen )
+                self.invader_bullets_group.draw( self.screen )
+                self.player_bullets_group.draw( self.screen )
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            game = False
+                self.player.update()
 
-    pygame.display.update()
+            elif self.gameover == 1:
+                self.background = pygame.image.load('./images/gameover_background.jpg')
 
-pygame.quit()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game = False
+
+            pygame.display.update()
+
+        pygame.quit()
+
+    def create_invaders(self):
+        for row in range(self.rows):
+            for col in range(self.cols):
+                invader = Invader(self, 100 + col * 65, 80 + row * 50)
+                self.invaders_group.add( invader )
+
+    def create_invader_bullets(self):
+        attacking_invader = random.choice( self.invaders_group.sprites() )
+        invader_bullet = Invader_Bullet( self, attacking_invader.rect.centerx, attacking_invader.rect.centery )
+        self.invader_bullets_group.add( invader_bullet )
+
+if __name__ == '__main__':
+    game = Game()
