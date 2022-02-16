@@ -24,6 +24,9 @@ class Game:
 
         self.background = pygame.image.load('./images/background.jpg')
 
+        self.sound = pygame.mixer.Sound('./images/game.wav')
+        self.sound.play()
+
         self.invaders_group = pygame.sprite.Group()
         self.player_group = pygame.sprite.Group()
 

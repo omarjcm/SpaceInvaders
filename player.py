@@ -38,7 +38,6 @@ class Player(pygame.sprite.Sprite):
             self.game.player_bullets_group.add( bullet )
             self.last_shot = pygame.time.get_ticks()
 
-
 class Player_Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, game):
         pygame.sprite.Sprite.__init__(self)
